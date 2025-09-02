@@ -11,9 +11,14 @@
     <name>BMC - BMC Resources Parent</name>
     <description>
         BMC - BOM and Build System Parent for Resources and "non-services" children BOMs. Children BOMs using this project are most likely
-        framework-agnostic. This is the first and top parent for every general resource / standalone jar / maven plugin project. The existence of this
-        project is because the bmc-parent template will contain resources that, if built with itself fow alignment, will create circular dependencies
-        that are better to avoid. The resources created with this Pom as parent will likely be included in the bmc-parent template, try to use that
+        framework-agnostic.
+        _
+        This is the first and top parent for every general resource / standalone jar / maven plugin project.
+        _
+        The existence of this project is because the bmc-parent template will contain resources that, if built with itself for alignment, will create
+        circular dependencies that are better to avoid.
+        _
+        The resources created with this Pom as parent will likely be included in the bmc-parent template, try to use that
         template instead of this one where possible to benefit from all its features, that will not be present in this one.
     </description>
     <url>https://www.bmc-anvil.com/</url>
