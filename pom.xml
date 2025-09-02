@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>bmc.dev.resources.code</groupId>
+    <artifactId>bmc-resources-parent</artifactId>
+    <version>bmc-local</version>
+    <packaging>pom</packaging>
+
+    <name>BMC - BMC Resources Parent</name>
+    <description>
+        BMC - BOM and Build System Parent for Resources and "non-services" children BOMs. Children BOMs using this project are most likely
+        framework-agnostic. This is the first and top parent for every general resource / standalone jar / maven plugin project. The existence of this
+        project is because the bmc-parent template will contain resources that, if built with itself fow alignment, will create circular dependencies
+        that are better to avoid. The resources created with this Pom as parent will likely be included in the bmc-parent template, try to use that
+        template instead of this one where possible to benefit from all its features, that will not be present in this one.
+    </description>
+    <url>https://www.bmc-anvil.com/</url>
+
+    <properties>
+        <!-- Keep properties in alphabetical order  -->
+        <!-- Configuration  -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- GitHub Repositories -->
+        <github.org>bmc-anvil</github.org>
+        <github.packages.id>github</github.packages.id>
+        <github.packages.name>GitHub Packages</github.packages.name>
+        <github.packages.base-url>https://maven.pkg.github.com</github.packages.base-url>
+        <github.repository>${project.groupId}.${project.artifactId}</github.repository>
+
+        <!-- Java / Maven Configuration  -->
+        <maven.compiler.parameters>true</maven.compiler.parameters>
+        <maven.compiler.release>25</maven.compiler.release>
+        <maven.compiler.proc>full</maven.compiler.proc>
+        <maven.min.version>3.9.9</maven.min.version>
+
+        <!-- Plugins Versions  -->
+        <checkstyle-plugin.version>3.6.0</checkstyle-plugin.version>
+        <compiler-plugin.version>3.14.0</compiler-plugin.version>
+        <deploy-plugin.version>3.1.4</deploy-plugin.version>
+        <enforcer-plugin.version>3.6.1</enforcer-plugin.version>
+        <jar-plugin.version>3.4.2</jar-plugin.version>
+        <javadoc-plugin.version>3.11.3</javadoc-plugin.version>
+        <resources-plugin.version>3.3.1</resources-plugin.version>
+        <shade-plugin.version>3.6.0</shade-plugin.version>
+        <source-plugin.version>3.3.1</source-plugin.version>
+
+        <!-- Plugins Configurations  -->
+        <shade-plugin.mainclass>bmc.dev.MainClass</shade-plugin.mainclass>
+
+        <!-- Versions -->
+        <checkstyle.version>11.0.1</checkstyle.version>
+    </properties>
+
+    <!-- About Licenses:
+         This section may / will change over time as the project grows / shrinks / changes in repositories, resources, assets, etc.
+         Not every repository, resource, asset, etc. will use the same licensing approach.
+         This means I will change the licensing at my own will over time at any time without notice.
+         -
+         The idea behind this project is to showcase, learn and share, but without losing control of my own creation.
+         -
+         Parts of the project anyone will be able to be incorporated on closed-source code without sharing your own code nor adopting a copy-left
+         license. (Apache License v2 / other?)
+         Other parts will be licenced so you can also use them at will but MUST still be FOSS, and you need to reshare your modifications and keep
+         the code available. (LGPL v3 / other?)
+         Licensing may / will change at any time, with no notice.
+    -->
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Johnny X</name>
+            <organization>BareMetalCode</organization>
+            <organizationUrl>https://www.baremetalcode.com/</organizationUrl>
+        </developer>
+        <developer>
+            <name>BareMetalCode Devs</name>
+            <organization>BareMetalCode</organization>
+            <organizationUrl>https://www.baremetalcode.com/</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/${github.org}/${github.repository}.git</connection>
+        <developerConnection>scm:git:ssh://github.com:${github.org}/${github.repository}.git</developerConnection>
+        <url>${project.url}</url>
+    </scm>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Apache Maven build Plugins -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>${checkstyle-plugin.version}</version>
+                    <dependencies>
+                        <!-- use latest checkstyle version-->
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>${checkstyle.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <configLocation>${project.basedir}/checkstyle.xml</configLocation>
+                        <outputFile>${project.build.directory}/checkstyle-result.sarif</outputFile>
+                        <outputFileFormat>sarif</outputFileFormat>
+                        <excludeGeneratedSources>true</excludeGeneratedSources>
+                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                        <inputEncoding>UTF-8</inputEncoding>
+                        <outputEncoding>UTF-8</outputEncoding>
+                        <consoleOutput>true</consoleOutput>
+                        <linkXRef>false</linkXRef>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${compiler-plugin.version}</version>
+                    <!--
+                        Java >=23 requires explicit configuration of annotation processing.
+                        Add the proper configuration to children of this parent POM.
+                        I.e., the BMC Quarkus framework's parent POM.
+                    -->
+                    <configuration/>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>${deploy-plugin.version}</version>
+                    <configuration>
+                        <deployAtEnd>true</deployAtEnd>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>${enforcer-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>enforce</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <requireJavaVendor>
+                                        <!-- java -XshowSettings:properties -version 2>&1 | grep vendor -->
+                                        <message>To build this project one of the JDK in the "includes" list has to be used</message>
+                                        <includes>
+                                            <!-- commercial vendors to include: DO NOT include any commercial vendors -->
+                                            <!-- open-source vendors to include -->
+                                            <include>OpenJDK</include>
+                                            <include>openjdk</include>
+                                            <include>GraalVM</include>
+                                            <!-- need to include Oracle as an OSS vendor given they provide a GNU GPL build of the JDK  -->
+                                            <include>Oracle Corporation</include>
+                                            <!-- workaround for missing java.vendor property in some OpenJDK builds-->
+                                            <include>N/A</include>
+                                        </includes>
+                                    </requireJavaVendor>
+                                    <requireJavaVersion>
+                                        <message>To build this project JDK >=${maven.compiler.release} is required. Please install it.</message>
+                                        <version>${maven.compiler.release}</version>
+                                    </requireJavaVersion>
+                                    <requireMavenVersion>
+                                        <message>To build this project Maven >=${maven.min.version} is required. Please install it.</message>
+                                        <version>${maven.min.version}</version>
+                                    </requireMavenVersion>
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${jar-plugin.version}</version>
+                    <!-- Configuration to allow including .gitignore file into this project's JAR-->
+                    <configuration>
+                        <addDefaultExcludes>false</addDefaultExcludes>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>${javadoc-plugin.version}</version>
+                    <configuration>
+                        <release>${maven.compiler.release}</release>
+                        <doclint>none</doclint>
+                        <additionalJOptions>
+                            <additionalJOption>-Xdoclint:none</additionalJOption>
+                        </additionalJOptions>
+                        <failOnError>false</failOnError>
+                        <skip>false</skip>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>attach-javadocs</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                            <phase>package</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${resources-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>${shade-plugin.version}</version>
+                    <configuration>
+                        <createDependencyReducedPom>false</createDependencyReducedPom>
+                        <transformers>
+                            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <mainClass>${shade-plugin.mainclass}</mainClass>
+                            </transformer>
+                        </transformers>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>${source-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <goals>
+                                <goal>jar-no-fork</goal>
+                            </goals>
+                            <phase>package</phase>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <attach>true</attach>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <!-- This profile is executed to deploy "libraries" or "modules" with corresponding documentation and sources to a given repository. -->
+        <!-- As not every project is a library, this configuration needs not be part of the general configuration. -->
+        <profile>
+            <id>deployable-jar</id>
+            <activation>
+                <property>
+                    <name>deployable-jar</name>
+                </property>
+            </activation>
+            <properties>
+                <maven.source.skip>false</maven.source.skip>
+                <maven.javadoc.skip>false</maven.javadoc.skip>
+            </properties>
+            <distributionManagement>
+                <repository>
+                    <id>${github.packages.id}</id>
+                    <name>${github.packages.name}</name>
+                    <url>${github.packages.base-url}/${github.org}/${github.repository}</url>
+                </repository>
+            </distributionManagement>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
