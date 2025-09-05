@@ -31,6 +31,7 @@
 
         <!-- GitHub Repositories -->
         <github.org>bmc-anvil</github.org>
+        <github.scm>scm:git:https://github.com</github.scm>
         <github.packages.id>github</github.packages.id>
         <github.packages.name>GitHub Packages</github.packages.name>
         <github.packages.base-url>https://maven.pkg.github.com</github.packages.base-url>
@@ -52,12 +53,23 @@
         <resources-plugin.version>3.3.1</resources-plugin.version>
         <shade-plugin.version>3.6.0</shade-plugin.version>
         <source-plugin.version>3.3.1</source-plugin.version>
+        <!--
+         NOTE:
+            Maven-plugin-plugin 3.13.1, latest for maven 3.9.9, supports bytecode up to version 67 - jdk 23.
+            When updating this plugin, check for dependent projects and update the maven-compiler version accordingly.
+         -->
+        <maven-plugin-plugin.version>3.13.1</maven-plugin-plugin.version>
 
-        <!-- Plugins Configurations  -->
-        <shade-plugin.mainclass>bmc.dev.MainClass</shade-plugin.mainclass>
+        <!-- Maven Plugins Creation Versions  -->
+        <maven.core.version>3.9.9</maven.core.version>
+        <maven-plugin.api.version>3.9.9</maven-plugin.api.version>
+        <maven-plugin.annotations.version>3.13.1</maven-plugin.annotations.version>
 
         <!-- Versions -->
         <checkstyle.version>11.0.1</checkstyle.version>
+        <commons.lang3.version>3.18.0</commons.lang3.version>
+        <junit.jupiter.version>5.13.4</junit.jupiter.version>
+        <lombok.version>1.18.38</lombok.version>
     </properties>
 
     <!-- About Licenses:
@@ -79,6 +91,16 @@
             <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
+        <license>
+            <name>GNU Lesser General Public License, Version 3.0</name>
+            <url>https://www.gnu.de/documents/lgpl-3.0.en.html</url>
+            <distribution>repo</distribution>
+        </license>
+        <license>
+            <name>GNU General Public License, Version 2.0</name>
+            <url>https://www.gnu.de/documents/gpl-2.0.en.html</url>
+            <distribution>repo</distribution>
+        </license>
     </licenses>
 
     <developers>
@@ -95,10 +117,60 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/${github.org}/${github.repository}.git</connection>
-        <developerConnection>scm:git:ssh://github.com:${github.org}/${github.repository}.git</developerConnection>
+        <connection>${github.scm}/${github.org}/${github.repository}.git</connection>
+        <developerConnection>${github.scm}/${github.org}/${github.repository}.git</developerConnection>
         <url>${project.url}</url>
     </scm>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Libraries -->
+            <!-- BuildTime Libraries -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>compile</scope>
+            </dependency>
+
+            <!-- Utilities -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons.lang3.version}</version>
+            </dependency>
+
+            <!-- Maven Plugin Creation Dependencies -->
+            <!-- The scope for must be "provided"-->
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-core</artifactId>
+                <version>${maven.core.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven.plugin-tools</groupId>
+                <artifactId>maven-plugin-annotations</artifactId>
+                <version>${maven-plugin.annotations.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-plugin-api</artifactId>
+                <version>${maven-plugin.api.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Test dependencies -->
+            <!-- For test dependencies, the scope is "test"-->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${junit.jupiter.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <pluginManagement>
@@ -135,7 +207,6 @@
                     <!--
                         Java >=23 requires explicit configuration of annotation processing.
                         Add the proper configuration to children of this parent POM.
-                        I.e., the BMC Quarkus framework's parent POM.
                     -->
                     <configuration/>
                 </plugin>
@@ -191,7 +262,7 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>${jar-plugin.version}</version>
-                    <!-- Configuration to allow including .gitignore file into this project's JAR-->
+                    <!-- Configuration to allow including .gitignore file into a project's JAR-->
                     <configuration>
                         <addDefaultExcludes>false</addDefaultExcludes>
                     </configuration>
@@ -221,21 +292,26 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <version>${resources-plugin.version}</version>
+                    <artifactId>maven-plugin-plugin</artifactId>
+                    <version>${maven-plugin-plugin.version}</version>
+                    <configuration>
+                        <goalPrefix>${project.artifactId}</goalPrefix>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>default-descriptor</id>
+                            <goals>
+                                <goal>descriptor</goal>
+                                <goal>helpmojo</goal>
+                            </goals>
+                            <phase>process-classes</phase>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-shade-plugin</artifactId>
-                    <version>${shade-plugin.version}</version>
-                    <configuration>
-                        <createDependencyReducedPom>false</createDependencyReducedPom>
-                        <transformers>
-                            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                <mainClass>${shade-plugin.mainclass}</mainClass>
-                            </transformer>
-                        </transformers>
-                    </configuration>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${resources-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
