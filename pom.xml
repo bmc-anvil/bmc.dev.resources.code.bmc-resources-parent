@@ -44,33 +44,35 @@
         <maven.min.version>3.9.9</maven.min.version>
 
         <!-- Plugins Versions  -->
-        <checkstyle-plugin.version>3.6.0</checkstyle-plugin.version>
-        <compiler-plugin.version>3.14.0</compiler-plugin.version>
-        <deploy-plugin.version>3.1.4</deploy-plugin.version>
-        <enforcer-plugin.version>3.6.1</enforcer-plugin.version>
-        <jar-plugin.version>3.4.2</jar-plugin.version>
-        <javadoc-plugin.version>3.11.3</javadoc-plugin.version>
-        <resources-plugin.version>3.3.1</resources-plugin.version>
-        <shade-plugin.version>3.6.0</shade-plugin.version>
-        <source-plugin.version>3.3.1</source-plugin.version>
-        <!--
-         NOTE:
-            Maven-plugin-plugin 3.13.1, latest for maven 3.9.9, supports bytecode up to version 67 - jdk 23.
-            When updating this plugin, check for dependent projects and update the maven-compiler version accordingly.
-         -->
-        <maven-plugin-plugin.version>3.13.1</maven-plugin-plugin.version>
+        <plugin.checkstyle.version>3.6.0</plugin.checkstyle.version>
+        <plugin.jacoco.version>0.8.13</plugin.jacoco.version>
+        <plugin.maven.compiler.version>3.14.0</plugin.maven.compiler.version>
+        <plugin.maven.deploy.version>3.1.4</plugin.maven.deploy.version>
+        <plugin.maven.enforcer.version>3.6.1</plugin.maven.enforcer.version>
+        <plugin.maven.jar.version>3.4.2</plugin.maven.jar.version>
+        <plugin.maven.javadoc.version>3.11.3</plugin.maven.javadoc.version>
+        <plugin.maven.resources.version>3.3.1</plugin.maven.resources.version>
+        <plugin.maven.shade.version>3.6.0</plugin.maven.shade.version>
+        <plugin.maven.source.version>3.3.1</plugin.maven.source.version>
+        <plugin.maven.surefire.version>3.5.4</plugin.maven.surefire.version>
 
         <!-- Maven Plugins Creation Versions  -->
+        <!-- NOTE:
+              Maven-plugin-plugin 3.13.1, latest for maven 3.9.9, supports bytecode up to version 67 - jdk 23.
+              When updating this plugin, check for dependent projects and update the maven-compiler version accordingly.
+         -->
         <maven.core.version>3.9.9</maven.core.version>
-        <maven-plugin.api.version>3.9.9</maven-plugin.api.version>
-        <maven-plugin.annotations.version>3.13.1</maven-plugin.annotations.version>
+        <maven.plugin.api.version>3.9.9</maven.plugin.api.version>
+        <maven.plugin.plugin.version>3.13.1</maven.plugin.plugin.version>
+        <maven.plugin.tools.plugin.annotations.version>3.13.1</maven.plugin.tools.plugin.annotations.version>
 
         <!-- Versions -->
         <apache.commons.collections.version>4.5.0</apache.commons.collections.version>
         <apache.commons.lang3.version>3.18.0</apache.commons.lang3.version>
         <checkstyle.version>11.0.1</checkstyle.version>
-        <junit.jupiter.version>5.13.4</junit.jupiter.version>
-        <lombok.version>1.18.40</lombok.version>
+        <junit.bom.version>5.13.4</junit.bom.version>
+        <lombok.version>1.18.42</lombok.version>
+        <mockito.bom.version>5.20.0</mockito.bom.version>
     </properties>
 
     <!-- About Licenses:
@@ -125,6 +127,23 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- BOMS -->
+            <!-- Test dependencies -->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-bom</artifactId>
+                <version>${mockito.bom.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.bom.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+
             <!-- Libraries -->
             <!-- BuildTime Libraries -->
             <dependency>
@@ -157,23 +176,14 @@
             <dependency>
                 <groupId>org.apache.maven.plugin-tools</groupId>
                 <artifactId>maven-plugin-annotations</artifactId>
-                <version>${maven-plugin.annotations.version}</version>
+                <version>${maven.plugin.tools.plugin.annotations.version}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.maven</groupId>
                 <artifactId>maven-plugin-api</artifactId>
-                <version>${maven-plugin.api.version}</version>
+                <version>${maven.plugin.api.version}</version>
                 <scope>provided</scope>
-            </dependency>
-
-            <!-- Test dependencies -->
-            <!-- For test dependencies, the scope is "test"-->
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter</artifactId>
-                <version>${junit.jupiter.version}</version>
-                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -185,7 +195,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>${checkstyle-plugin.version}</version>
+                    <version>${plugin.checkstyle.version}</version>
                     <dependencies>
                         <!-- use latest checkstyle version-->
                         <dependency>
@@ -209,17 +219,25 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${compiler-plugin.version}</version>
+                    <version>${plugin.maven.compiler.version}</version>
                     <!--
                         Java >=23 requires explicit configuration of annotation processing.
                         Add the proper configuration to children of this parent POM.
                     -->
-                    <configuration/>
+                    <configuration>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>${deploy-plugin.version}</version>
+                    <version>${plugin.maven.deploy.version}</version>
                     <configuration>
                         <deployAtEnd>true</deployAtEnd>
                     </configuration>
@@ -227,7 +245,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>${enforcer-plugin.version}</version>
+                    <version>${plugin.maven.enforcer.version}</version>
                     <executions>
                         <execution>
                             <id>enforce</id>
@@ -267,7 +285,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>${jar-plugin.version}</version>
+                    <version>${plugin.maven.jar.version}</version>
                     <!-- Configuration to allow including .gitignore file into a project's JAR-->
                     <configuration>
                         <addDefaultExcludes>false</addDefaultExcludes>
@@ -276,7 +294,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>${javadoc-plugin.version}</version>
+                    <version>${plugin.maven.javadoc.version}</version>
                     <configuration>
                         <release>${maven.compiler.release}</release>
                         <doclint>none</doclint>
@@ -299,7 +317,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-plugin-plugin</artifactId>
-                    <version>${maven-plugin-plugin.version}</version>
+                    <version>${maven.plugin.plugin.version}</version>
                     <configuration>
                         <goalPrefix>${project.artifactId}</goalPrefix>
                     </configuration>
@@ -317,12 +335,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>${resources-plugin.version}</version>
+                    <version>${plugin.maven.resources.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>${source-plugin.version}</version>
+                    <version>${plugin.maven.source.version}</version>
                     <executions>
                         <execution>
                             <id>attach-sources</id>
@@ -335,6 +353,97 @@
                     <configuration>
                         <attach>true</attach>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${plugin.maven.surefire.version}</version>
+                    <configuration>
+                        <argLine>
+                            -javaagent:"${settings.localRepository}/org/mockito/mockito-core/${mockito.bom.version}/mockito-core-${mockito.bom.version}.jar"=--inline-mock-maker
+                        </argLine>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${plugin.jacoco.version}</version>
+                    <configuration>
+                        <haltOnFailure>false</haltOnFailure>
+                        <excludes>
+                            <!-- Exclude test classes -->
+                            <exclude>**/*Test.*</exclude>
+                            <exclude>**/*TestCase.*</exclude>
+                            <exclude>**/*IT.*</exclude>
+                        </excludes>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>default-prepare-agent</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>default-report</id>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>default-check</id>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <!--
+                                         There is no BUNDLE aka "overall" rule as we could have methods or entire classes not even tested and still achieve
+                                         a given percentage.
+                                         What we want is to make sure each class is tested to a certain amount and not that 9 out of 10 classes are tested and
+                                         1 remains untested.
+                                         That is a no-go.
+                                         Overriding this will be flagged by automated tools in ci/cd, and it is ok...
+                                         Tricks such as using @Generated / broad exclusions etc. are also flagged.
+                                         Using such tricks is probably fine as we may need to be able to circumvent some strict rules in certain cases.
+                                         Still... someone has to keep an eye (CI/CD will) that exceptions do not become rule and if they become the case,
+                                         reexamine the rules.
+
+                                         The rules below may seem a lot, but the children of this resources-parent are projects targeting the base of
+                                         the codebase.
+                                         They'll probably become stricter in time.
+                                    -->
+                                    <!-- Class complexity limit -->
+                                    <rule>
+                                        <element>CLASS</element>
+                                        <limits>
+                                            <limit>
+                                                <counter>LINE</counter>
+                                                <value>COVEREDRATIO</value>
+                                                <minimum>0.90</minimum>
+                                            </limit>
+                                            <limit>
+                                                <counter>BRANCH</counter>
+                                                <value>COVEREDRATIO</value>
+                                                <minimum>1.00</minimum>
+                                            </limit>
+                                        </limits>
+                                    </rule>
+                                    <!-- Method complexity limit -->
+                                    <rule>
+                                        <element>METHOD</element>
+                                        <limits>
+                                            <limit>
+                                                <counter>COMPLEXITY</counter>
+                                                <value>TOTALCOUNT</value>
+                                                <maximum>7</maximum>
+                                            </limit>
+                                        </limits>
+                                    </rule>
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -351,6 +460,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
