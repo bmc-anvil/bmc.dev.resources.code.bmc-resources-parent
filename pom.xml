@@ -73,6 +73,7 @@
         <junit.bom.version>5.13.4</junit.bom.version>
         <lombok.version>1.18.42</lombok.version>
         <mockito.bom.version>5.20.0</mockito.bom.version>
+        <slf4j.simple.version>1.7.36</slf4j.simple.version>
     </properties>
 
     <!-- About Licenses:
@@ -184,6 +185,20 @@
                 <artifactId>maven-plugin-api</artifactId>
                 <version>${maven.plugin.api.version}</version>
                 <scope>provided</scope>
+            </dependency>
+
+            <!--
+                 We only need this for test as maven-core et als bring it to production code.
+                 For this to correctly bind to SLF4J, it has to match the same version of any other implementation already present,
+                 and maven brings the one below.
+                 Update the version if maven updates its version
+                 Simple outputs to system.err, so all logs will be red.
+            -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>${slf4j.simple.version}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
