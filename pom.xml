@@ -375,7 +375,7 @@
                     <version>${plugin.maven.surefire.version}</version>
                     <configuration>
                         <argLine>
-                            -javaagent:"${settings.localRepository}/org/mockito/mockito-core/${mockito.bom.version}/mockito-core-${mockito.bom.version}.jar"=--inline-mock-maker
+                            @{argLine} -javaagent:"${settings.localRepository}/org/mockito/mockito-core/${mockito.bom.version}/mockito-core-${mockito.bom.version}.jar"=--inline-mock-maker
                         </argLine>
                     </configuration>
                 </plugin>
