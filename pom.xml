@@ -45,14 +45,12 @@
 
         <!-- Plugins Versions  -->
         <plugin.checkstyle.version>3.6.0</plugin.checkstyle.version>
-        <plugin.jacoco.version>0.8.13</plugin.jacoco.version>
+        <plugin.jacoco.version>0.8.14</plugin.jacoco.version>
         <plugin.maven.compiler.version>3.14.0</plugin.maven.compiler.version>
         <plugin.maven.deploy.version>3.1.4</plugin.maven.deploy.version>
-        <plugin.maven.enforcer.version>3.6.1</plugin.maven.enforcer.version>
+        <plugin.maven.enforcer.version>3.6.2</plugin.maven.enforcer.version>
         <plugin.maven.jar.version>3.4.2</plugin.maven.jar.version>
         <plugin.maven.javadoc.version>3.12.0</plugin.maven.javadoc.version>
-        <plugin.maven.resources.version>3.3.1</plugin.maven.resources.version>
-        <plugin.maven.shade.version>3.6.0</plugin.maven.shade.version>
         <plugin.maven.source.version>3.3.1</plugin.maven.source.version>
         <plugin.maven.surefire.version>3.5.4</plugin.maven.surefire.version>
 
@@ -69,7 +67,7 @@
         <!-- Versions -->
         <apache.commons.collections.version>4.5.0</apache.commons.collections.version>
         <apache.commons.lang3.version>3.19.0</apache.commons.lang3.version>
-        <checkstyle.version>11.1.0</checkstyle.version>
+        <checkstyle.version>12.1.0</checkstyle.version>
         <junit.bom.version>5.13.4</junit.bom.version>
         <lombok.version>1.18.42</lombok.version>
         <mockito.bom.version>5.20.0</mockito.bom.version>
@@ -349,11 +347,6 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <version>${plugin.maven.resources.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
                     <version>${plugin.maven.source.version}</version>
                     <executions>
@@ -375,7 +368,8 @@
                     <version>${plugin.maven.surefire.version}</version>
                     <configuration>
                         <argLine>
-                            @{argLine} -javaagent:"${settings.localRepository}/org/mockito/mockito-core/${mockito.bom.version}/mockito-core-${mockito.bom.version}.jar"=--inline-mock-maker
+                            @{argLine}
+                            -javaagent:"${settings.localRepository}/org/mockito/mockito-core/${mockito.bom.version}/mockito-core-${mockito.bom.version}.jar"=--inline-mock-maker
                         </argLine>
                     </configuration>
                 </plugin>
